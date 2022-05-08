@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
 const collegeModel = require('../models/collegeModel')
 const internModel = require('../models/internModel')
+
 const ObjectId = mongoose.Types.ObjectId;
-const dv = /[a-zA-Z]/;   //string 
+const dv = /^[a-zA-Z][a-zA-Z ]+[a-zA-Z]$/;   //string 
 const mob = /^\d{10}$/;   //mobile
 const evalid = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,20}$/;  // for email 
+
 
 const createColleges = async function (req, res) {
     try {
@@ -110,7 +112,5 @@ const collegeDetails = async function (req, res) {
     }
 };
 
-module.exports.createColleges = createColleges
-module.exports.createInterns = createInterns
-module.exports.collegeDetails = collegeDetails
+module.exports={createColleges,createInterns,collegeDetails}
 
