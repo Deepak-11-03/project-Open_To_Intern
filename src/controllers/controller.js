@@ -65,7 +65,7 @@ const createInterns = async function (req, res) {
         if ((mobile == 0) || !mob.test(mobile)) {
             return res.status(400).send({ status: false, msg: " moblie number should be of 10 digit" })
         }
-        // checking mobile in database
+        // checking mobile in db
         existingMobile = await internModel.findOne({ mobile: mobile })
         if (existingMobile) {
             return res.status(400).send({ msg: "Mobile no. is already exist" })
