@@ -47,7 +47,7 @@ const createInterns = async function (req, res) {
             return res.status(400).send({ status: false, msg: 'Invalid Request !! Please Enter intern Detail ' })
         }
 
-        const { name, email, mobile, collegeId } = data
+        const { name, email, mobile, collegeName } = data
         // check that user is provide only string
         if ((name == 0) || !dv.test(name)) {
             return res.status(400).send({ status: false, msg: "please provide name of intern" })
@@ -70,12 +70,17 @@ const createInterns = async function (req, res) {
         if (existingMobile) {
             return res.status(400).send({ msg: "Mobile no. is already exist" })
         }
-        // check the collegeId is valid type of Id or blank
-        if ((collegeId == 0) || !ObjectId.isValid(collegeId)) {
-            return res.status(400).send({ status: false, msg: "please provide a valid  collegeId" })
+        //checking collageName is present in Db or not
+        const collegePresent = await collegeModel.findOne({ name: collegeName, isDeleted: false })
+
+        if (!collegePresent) {
+            return res.status(400).send({ status: false, message: `no college found by this name: ${collegeName}` })
         }
+        const collegeID = collegePresent._id
+        data["collegeId"] = collegeID;
+
         // check te collegID is present or not
-        checkCollegeId = await collegeModel.findById({ _id: collegeId })
+        checkCollegeId = await collegeModel.findById({ _id: collegeID })
         if (!checkCollegeId) {
             return res.status(400).send({ status: false, msg: "college id is not found" })
         }
@@ -99,11 +104,11 @@ const collegeDetails = async function (req, res) {
         }
 
         let id = college._id
-        let interns = await internModel.find({ collegeId: id, isDeleted: false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
-        if (interns.length == 0) {
+        let intern = await internModel.find({ collegeId: id, isDeleted: false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
+        if (intern.length == 0) {
             return res.status(400).send({ status: false, msg: "no intern found for this college" })
         }
-        let details = { name: college.name, fullName: college.fullName, logoLink: college.logoLink, interests: interns }
+        let details = { name: college.name, fullName: college.fullName, logoLink: college.logoLink, interns: intern }
         return res.status(200).send({ data: details });
 
     }
